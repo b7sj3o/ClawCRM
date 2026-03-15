@@ -1,0 +1,83 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "8000"
+    env_file:
+      - .env.docker
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/products"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    env_file:
+      - .env.docker
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    expose:
+      - "80"
+    environment:
+      NODE_ENV: production
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    depends_on:
+      web:
+        condition: service_started
+      api:
+        condition: service_healthy
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+    networks:
+      - default
+
+  # ngrok:
+  #   image: ngrok/ngrok:latest
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - nginx
+  #   env_file:
+  #     - .env.docker
+  #   command: http nginx:80 --config /etc/ngrok.yml
+  #   volumes:
+  #     - ./ngrok.yml:/etc/ngrok.yml
+  #   expose:
+  #     - "4040"
+  #   networks:
+  #     - default
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    driver: bridge

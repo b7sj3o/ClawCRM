@@ -1,0 +1,28 @@
+# line-length = 79
+
+[lint]
+extend-select = [
+    "F401", # unused import,
+    "F841",  # assigned but unused variable
+    "F821",  # undefined name
+    
+    "RET501",  # unnecessary return None
+    "RET502",  # implicit return None
+    "RET503",  # missing return
+    "RET504",  # unnecessary assignment before return
+    
+    "B006", # mutable default argument
+    # "B008",  # function call in default argument
+    "B010",  # setattr/getattr with constant
+    "B020",  # loop variable shadowing
+    "B023",  # function defined inside loop (closure bug)
+
+    "SIM102",  # nested if -> single if
+    "SIM103",  # return condition directly
+    "SIM105",  # try/except/pass → contextlib.suppress,
+
+    "UP035",  # deprecated imports
+
+    "I001",  # unsorted imports
+    "I002",  # missing import grouping
+    ]
