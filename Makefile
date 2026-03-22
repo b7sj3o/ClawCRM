@@ -22,7 +22,7 @@ dump-data:
 
 
 migrations:
-	alembic revision --autogenerate -m "
+	alembic revision --autogenerate -m "$(m)"
 
 migrate:
 	alembic upgrade head

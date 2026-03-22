@@ -20,6 +20,14 @@ class Settings(BaseSettings):
     debug: bool = False
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
+    clerk_publishable_key: str
+    clerk_secret_key: str
+    jwks_url: str
+    clerk_webhook_url: str
+    clerk_webhook_secret: str
+
+    frontend_url: str
+
     postgres_user: str
     postgres_password: str
     postgres_db: str
@@ -28,3 +36,8 @@ class Settings(BaseSettings):
     @property
     def database_url(self) -> str:
         return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}/{self.postgres_db}"
+
+
+    class Config:
+        env_file = ".env"
+        extra = "allow"

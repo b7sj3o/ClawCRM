@@ -1,26 +1,28 @@
-from pydantic import BaseModel, ConfigDict
+from api.schemas.base import BaseModel
+from api.schemas.product import ProductReadTreeDTO
 
 
-class ProductNodeBase(BaseModel):
+
+class ProductNodeReadDTO(BaseModel):
+    id: int
+    name: str
+    parent_id: int | None = None
+    children: list[int] = []
+    products: list[int] = []
+
+
+
+class ProductNodeCreateDTO(BaseModel):
     name: str
     parent_id: int | None = None
 
 
-class ProductNodeCreate(ProductNodeBase):
-    pass
-
-
-class ProductNodeUpdate(BaseModel):
-    name: str | None = None
-    parent_id: int | None = None
-
-
-class ProductNodeResponse(ProductNodeBase):
+class ProductNodeTreeDTO(BaseModel):
     id: int
+    name: str
+    children: list["ProductNodeTreeDTO"] = []
+    products: list[ProductReadTreeDTO] = []
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class ProductNodeList(BaseModel):
-    items: list[ProductNodeResponse]
-    total: int
+# used to resolve forward references in recursive models
+ProductNodeTreeDTO.model_rebuild() 

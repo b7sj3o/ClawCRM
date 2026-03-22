@@ -24,6 +24,6 @@ async_session = async_sessionmaker(
 async def create_db():
     async with engine.begin() as conn:
         logger.info("Creating database tables")
-        # await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
         logger.info("Database tables created")

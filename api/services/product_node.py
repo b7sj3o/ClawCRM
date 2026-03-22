@@ -1,65 +1,67 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends
 
 from api.db.models import ProductNode
-from api.repositories.product_node import ProductNodeRepository
-from api.schemas.product_node import (
-    ProductNodeCreate,
-    ProductNodeList,
-    ProductNodeUpdate,
-)
-
-product_node_repository = ProductNodeRepository()
+from api.exceptions import NotFoundError
+from api.repositories import ProductNodeRepository
+from api.schemas import ProductNodeTreeDTO, ProductNodeCreateDTO, ProductNodeReadDTO
 
 
 class ProductNodeService:
-    @staticmethod
-    async def get_by_id(db: AsyncSession, node_id: int) -> ProductNode | None:
-        return await product_node_repository.get_by_id(db, node_id)
 
-    @staticmethod
-    async def get_list(
-        db: AsyncSession,
-        *,
-        skip: int = 0,
-        limit: int = 100,
-        parent_id: int | None = None,
-    ) -> ProductNodeList:
-        if parent_id is not None:
-            items = await product_node_repository.get_by_parent_id(
-                db, parent_id=parent_id
+    def __init__(self, repo: ProductNodeRepository = Depends()):
+        self.repo = repo
+
+    
+    def _get_node_dto(self, node: ProductNode) -> ProductNodeTreeDTO:
+        return ProductNodeTreeDTO(
+            id=node.id,
+            name=node.name,
+            children=node.children,
+            products=node.products
+        )
+
+
+    async def get_products_list(self) -> list[ProductNodeReadDTO]:
+        nodes = await self.repo.list_nodes()
+        return [
+            ProductNodeReadDTO(
+                id=n.id,
+                name=n.name,
+                parent_id=n.parent_id,
+                children=[c.id for c in n.children],
+                products=[p.id for p in n.products],
             )
-            total = len(items)
-        else:
-            items = await product_node_repository.get_all(
-                db, skip=skip, limit=limit
-            )
-            total = await product_node_repository.count(db)
-        return ProductNodeList(
-            items=list(items),
-            total=total,
+            for n in nodes
+        ]
+
+
+    async def get_products_tree(self) -> list[ProductNodeTreeDTO]:
+        nodes = await self.repo.list_nodes()
+
+        return [ProductNodeTreeDTO(
+            id=node.id,
+            name=node.name,
+            children=node.children,
+            products=node.products
+        ) for node in nodes if node.parent_id is None]
+    
+    async def create_product_node(self, payload: ProductNodeCreateDTO) -> ProductNodeReadDTO:
+        if payload.parent_id is not None:
+            if not await self.repo.get_node_by_id(payload.parent_id):
+                raise NotFoundError("Тип продукту", payload.parent_id)
+
+
+        node = await self.repo.create_product_node(payload.model_dump(exclude_unset=True))
+        return ProductNodeReadDTO(
+            id=node.id,
+            name=node.name,
+            parent_id=node.parent_id,
         )
 
-    @staticmethod
-    async def get_roots(db: AsyncSession) -> list[ProductNode]:
-        return await product_node_repository.get_by_parent_id(
-            db, parent_id=None
-        )
+    async def delete_product_node(self, obj_id: int):
+        product_node = await self.repo.get_node_by_id(obj_id)
+        if not product_node:
+            raise NotFoundError("Тип продукту", obj_id)
 
-    @staticmethod
-    async def create(db: AsyncSession, data: ProductNodeCreate) -> ProductNode:
-        return await product_node_repository.create(
-            db,
-            name=data.name,
-            parent_id=data.parent_id,
-        )
-
-    @staticmethod
-    async def update(
-        db: AsyncSession, node: ProductNode, data: ProductNodeUpdate
-    ) -> ProductNode:
-        update_data = data.model_dump(exclude_unset=True)
-        return await product_node_repository.update(db, node, **update_data)
-
-    @staticmethod
-    async def delete(db: AsyncSession, node_id: int) -> bool:
-        return await product_node_repository.delete_by_id(db, node_id)
+        
+        await self.repo.delete_product_node(product_node)
