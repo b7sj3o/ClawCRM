@@ -1,5 +1,6 @@
 import {
   createProductV1ProductNodesPost,
+  deleteProductV1ProductNodesObjIdDelete,
   listNodesTreeV1ProductNodesTreeGet,
   type ProductNodeCreateDto,
   type ProductNodeTreeDto,
@@ -7,7 +8,11 @@ import {
 
 export async function getProductNodeTree(): Promise<ProductNodeTreeDto[]> {
   const response = await listNodesTreeV1ProductNodesTreeGet()
-  return response.data ?? []
+  if (!Array.isArray(response.data)) {
+    throw new Error('API повернув невалідне дерево категорій')
+  }
+
+  return response.data
 }
 
 export async function createProductNode(payload: ProductNodeCreateDto) {
@@ -20,5 +25,13 @@ export async function createProductNode(payload: ProductNodeCreateDto) {
   }
 
   return response.data
+}
+
+export async function deleteProductNode(nodeId: number) {
+  await deleteProductV1ProductNodesObjIdDelete({
+    path: {
+      obj_id: nodeId,
+    },
+  })
 }
 

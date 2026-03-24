@@ -1,7 +1,9 @@
 import json
+from json.decoder import JSONDecodeError
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.requests import Request
+from fastapi.responses import JSONResponse
 
 from api.exceptions.domain import ClerkVerificationError
 from api.services.user import UserService
@@ -18,7 +20,15 @@ async def create_user(
 ):
     body = await request.body()
 
-    data = json.loads(body)
+    try:
+        data = json.loads(body)
+    except JSONDecodeError as e:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "detail": "Couldn't decode json"
+            }
+        )
 
     try:
         clerk_webhook.verify(body, request.headers)

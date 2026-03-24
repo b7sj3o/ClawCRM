@@ -17,5 +17,5 @@ COPY api/ /app/api/
 COPY alembic.ini /app/alembic.ini
 
 # Run migrations then start uvicorn
-# CMD ["sh", "-c", "alembic upgrade head && uvicorn api.main:app --host 0.0.0.0 --port 8000"]
-CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn api.main:app --host 0.0.0.0 --port 8000"]
+# CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port 8000"]

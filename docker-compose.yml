@@ -41,6 +41,8 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+    env_file:
+      - ./web/.env.docker
     expose:
       - "80"
     environment:

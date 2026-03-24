@@ -1,11 +1,12 @@
 FROM node:22-alpine AS builder
 
 WORKDIR /app
-COPY package*.json pnpm-lock.yaml .env ./
+COPY package*.json pnpm-lock.yaml .env.docker ./
 RUN npm install -g pnpm && pnpm install
 
 COPY . .
-RUN pnpm build
+
+RUN pnpm build --mode docker
 
 
 FROM nginx:alpine
