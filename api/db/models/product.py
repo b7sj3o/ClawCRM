@@ -10,8 +10,9 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from api.db.base import Base
 
 if TYPE_CHECKING:
-    from api.db.models.product_node import ProductNode
     from api.db.models.sale import Sale
+    from api.db.models.user import User
+    from api.db.models.product_node import ProductNode
 
 
 class Product(Base):
@@ -30,9 +31,17 @@ class Product(Base):
         ForeignKey("product_nodes.id"),
         nullable=False
     )
-
     node: Mapped["ProductNode"] = relationship(
         "ProductNode",
+        back_populates="products"
+    )
+
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=False
+    )
+    user: Mapped["User"] = relationship(
+        "User",
         back_populates="products"
     )
 

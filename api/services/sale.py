@@ -25,7 +25,7 @@ class SaleService:
         return [SaleReadDTO.model_validate(sale) for sale in sales]
 
     async def create_sale(self, payload: SaleCreateDTO, user: AuthUser) -> SaleReadDTO:
-        product = await self.product_repo.get_product_by_id(payload.product_id)
+        product = await self.product_repo.get_product_by_id(payload.product_id, user.user_id)
             
         if not product:
             raise NotFoundError("Продукт", payload.product_id)

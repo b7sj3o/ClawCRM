@@ -11,6 +11,8 @@ from api.db.base import Base
 
 if TYPE_CHECKING:
     from api.db.models.product import Product
+    from api.db.models.user import User
+
 
 
 class ProductNode(Base):
@@ -23,6 +25,13 @@ class ProductNode(Base):
         ForeignKey("product_nodes.id"),
         nullable=True,
         index=True
+    )
+
+    user_id: Mapped[str] = mapped_column(String(255), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user: Mapped["User"] = relationship(
+        "User",
+        back_populates="product_nodes",
+        cascade="all, delete"
     )
 
     parent: Mapped["ProductNode"] = relationship(

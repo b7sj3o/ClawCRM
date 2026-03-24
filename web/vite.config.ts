@@ -1,3 +1,4 @@
+import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
@@ -8,6 +9,11 @@ export default defineConfig({
   // Listen on IPv4 + IPv6 so both http://localhost:5173 and http://127.0.0.1:5173 work
   server: {
     host: true,
+  },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
   },
   plugins: [
     react(),

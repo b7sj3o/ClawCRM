@@ -14,11 +14,12 @@ class ProductNodeRepository:
         self.db = db
 
 
-    async def list_nodes(self) -> list[ProductNode]:
+    async def list_nodes(self, user_id: str) -> list[ProductNode]:
         # TODO: не витягувати відразу всі ноди, краще декілька рівнів і
         # ! робити запити по типу /nodes?parent_id=123&depth=2 
         stmt = (
             select(ProductNode)
+            .where(ProductNode.user_id == user_id)
             .options(
                 selectinload(ProductNode.products), 
                 selectinload(ProductNode.children),
@@ -30,8 +31,13 @@ class ProductNodeRepository:
 
         return list(result.all())
 
-    async def get_node_by_id(self, obj_id: int) -> ProductNode:
-        return await self.db.scalar(select(ProductNode).where(ProductNode.id == obj_id))
+    async def get_node_by_id(self, obj_id: int, user_id: str) -> ProductNode:
+        return await self.db.scalar(
+            select(ProductNode).where(
+                ProductNode.id == obj_id,
+                ProductNode.user_id == user_id,
+            )
+        )
 
 
     async def create_product_node(self, data) -> ProductNode:

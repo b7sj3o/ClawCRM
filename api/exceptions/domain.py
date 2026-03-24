@@ -13,3 +13,8 @@ class InsufficientStock(DomainError):
 class ClerkVerificationError(DomainError):
     def __init__(self):
         self.msg = "Не вдалось верифікувати ключ Clerk"
+
+
+class InvalidEmailError(DomainError):
+    def __init__(self, email: str):
+        self.msg = f"{email} не є валідним email"

@@ -7,5 +7,5 @@ class RepositoryError(AppError):
 
 
 class NotFoundError(RepositoryError):
-    def __init__(self, name: str, id: int):
+    def __init__(self, name: str, id: int | str):
         self.msg = f"{name} з ID={id} не знайдено"

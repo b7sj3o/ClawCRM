@@ -12,3 +12,8 @@ from .sale import (
     SaleReadDTO,
     SaleCreateDTO,
 )
+
+from .user import (
+    UserReadDTO,
+    UserCreateDTO,
+)

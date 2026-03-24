@@ -15,14 +15,19 @@ class ProductRepository:
         self.db = db
 
 
-    async def list_products(self) -> list[Product]:
-        result = await self.db.scalars(select(Product))
+    async def list_products(self, user_id: str) -> list[Product]:
+        result = await self.db.scalars(select(Product).where(Product.user_id == user_id))
 
         return result.all()
 
 
-    async def get_product_by_id(self, obj_id: int) -> Product:
-        return await self.db.scalar(select(Product).where(Product.id == obj_id))
+    async def get_product_by_id(self, obj_id: int, user_id: str) -> Product:
+        return await self.db.scalar(
+            select(Product).where(
+                Product.id == obj_id,
+                Product.user_id == user_id,
+            )
+        )
 
 
     async def create_product(self, data) -> Product:

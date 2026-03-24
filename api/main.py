@@ -11,6 +11,7 @@ from api.routers import (
     product_nodes_router,
     sales_router
 )
+from api.routers.v1.webhooks.clerk.users import router as clerk_users_router
 
 
 def create_app() -> FastAPI:
@@ -46,6 +47,7 @@ def create_app() -> FastAPI:
     app.include_router(products_router, prefix="/v1/products", tags=["products"])
     app.include_router(product_nodes_router, prefix="/v1/product_nodes", tags=["product_nodes"])
     app.include_router(sales_router, prefix="/v1/sales", tags=["sales"])
+    app.include_router(clerk_users_router, prefix="/v1/webhooks/clerk/users", tags=["clerk_webhooks"])
 
     register_exception_handler(app)
 

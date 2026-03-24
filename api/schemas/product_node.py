@@ -7,6 +7,7 @@ class ProductNodeReadDTO(BaseModel):
     id: int
     name: str
     parent_id: int | None = None
+    user_id: str
     children: list[int] = []
     products: list[int] = []
 

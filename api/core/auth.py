@@ -17,19 +17,19 @@ class AuthUser:
 
     @property
     def can_view(self) -> bool:
-        return self.has_permission("org:tasks:view")
+        return self.has_permission("org:products:view")
 
     @property
     def can_create(self) -> bool:
-        return self.has_permission("org:tasks:create")
+        return self.has_permission("org:products:create")
 
     @property
     def can_delete(self) -> bool:
-        return self.has_permission("org:tasks:delete")
+        return self.has_permission("org:products:delete")
 
     @property
     def can_edit(self) -> bool:
-        return self.has_permission("org:tasks:edit")
+        return self.has_permission("org:products:edit")
 
 
 def convert_to_httpx_request(fastapi_request: Request) -> httpx.Request:
